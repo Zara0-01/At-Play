@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "collect_types",
+  "info": {
+    "singularName": "collect-type",
+    "pluralName": "collect-types",
+    "displayName": "CollectType"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Nam": {
+      "type": "string"
+    }
+  }
+}
