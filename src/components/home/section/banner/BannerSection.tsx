@@ -5,6 +5,7 @@ import VideoPopUp from 'shared/ui/popup/video-popop/VideoPopUp'
 import { LinkButton } from 'shared/ui/buttons/ButtonUi'
 import TextAnimation from 'utils/hooks/useAnimatetText'
 import { VideoFrame } from 'shared/ui/design/video-frame/VideFrame'
+import { getHomePageFullInfo } from 'shared/helpers/generic-api'
 
 import BannerImage from 'assets/images/home/banner/banner-one-thumb.png'
 import VideoFrameIcon from 'assets/images/popup-video.png'
@@ -19,6 +20,9 @@ function BannerSection() {
     const [ isModalOpen, setIsModalOpen ] = useState(false)
     const [ scrollPosition, setScrollPosition ] = useState(0)
     const bannerImageRef = useRef(null)
+
+    const [ homeData, setHomeData ] = useState<any>([])
+    const parts = homeData?.Title ? homeData.Title.split(/\{(.*?)\}/).filter(Boolean) : []
 
     const openYouTubeVideo = () => {
         setIsModalOpen(true)
@@ -38,6 +42,18 @@ function BannerSection() {
         return () => {
             window.removeEventListener("scroll", handleScroll)
         }
+    }, [])
+
+    useEffect(() => {
+        async function getHomePageFullData() {
+            try {
+                const res = await getHomePageFullInfo()
+                if (res) setHomeData(res.data.attributes)
+            } catch (error) {
+                console.error('Failed to fetch home page data:', error)
+            }
+        }
+        getHomePageFullData()
     }, [])
 
     useEffect(() => {
@@ -70,6 +86,10 @@ function BannerSection() {
         }
     }, [scrollPosition])
 
+    const parseTitle = (title: string) => {
+        return title
+    }
+
     return (
         <section className="banner">
             <div className="container">
@@ -77,18 +97,25 @@ function BannerSection() {
                     <div className="col-12">
                         <div className="banner__content">
                             <h1 className="text-uppercase text-start fw-9 mb-0 title-anim">
-                                <TextAnimation text="we are" />
-                                <span className="text-stroke">
-                                    <TextAnimation text="creative" />
-                                </span>
-                                <span className="interval">
-                                    <i className="fa-solid fa-arrow-right" style={{ transform: 'rotate(320deg)' }}></i>
-                                    <TextAnimation text="marketing agency" />
-                                </span>
+                                {parts.map((part: string, index: number) => (
+                                    <React.Fragment key={index}>
+                                        {index === 0 && <TextAnimation text={parseTitle(part)} />}
+                                        {index === 1 && (
+                                            <span className="text-stroke">
+                                                <TextAnimation text={parseTitle(part)} />
+                                            </span>
+                                        )}
+                                        {index === 4 && (
+                                            <span className="interval">
+                                                <i className="fa-solid fa-arrow-right" style={{ transform: 'rotate(320deg)' }}></i>
+                                                <TextAnimation text={parseTitle(part)} />
+                                            </span>
+                                        )}
+                                    </React.Fragment>
+                                ))}
                             </h1>
                             <div className="banner__content-inner">
-                                <p>We are a full-service website design, development and digital marketing company
-                                    specializing in SEO, content marketing that grows brands.</p>
+                                <p>{homeData?.Description}</p>
                                 <div className="cta section__content-cta">
                                     <div className="single">
                                         <h5 className="fw-7">
